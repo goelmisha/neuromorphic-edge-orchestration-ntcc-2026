@@ -1,0 +1,42 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: neuromorphicruntimes.ai.amity.edu
+  labels:
+    app.kubernetes.io/name: neuromorphic-operator
+    app.kubernetes.io/part-of: elastic-neuromorphic-cloud
+spec:
+  group: ai.amity.edu
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required: ["targetArchitecture", "synapticMemoryLimitMB", "lavaCSPChannels", "synchronizationBarrier"]
+              properties:
+                targetArchitecture:
+                  type: string
+                  enum: ["x86_64", "arm64", "loihi2", "akida_akd1000"]
+                synapticMemoryLimitMB:
+                  type: integer
+                  minimum: 128
+                lavaCSPChannels:
+                  type: integer
+                  default: 16
+                synchronizationBarrier:
+                  type: string
+                  enum: ["strict", "relaxed", "async"]
+                  default: "strict"
+  scope: Namespaced
+  names:
+    plural: neuromorphicruntimes
+    singular: neuromorphicruntime
+    kind: NeuromorphicRuntime
+    shortNames:
+      - nr
+      - snn

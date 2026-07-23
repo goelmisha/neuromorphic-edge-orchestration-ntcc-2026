@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  telemetry-broker:
+    image: redis:alpine
+    container_name: lava-redis-bus
+    ports:
+      - "6379:6379"
+    networks:
+      neuromorphic_mesh:
+        ipv4_address: 10.0.0.5
+
+networks:
+  neuromorphic_mesh:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1280
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
