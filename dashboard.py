@@ -22,6 +22,15 @@ def create_layout():
     )
     return layout
 
+def render_input():
+    """Generates a professional UI panel for the empty left column."""
+    text = Text("Dense Vector Stream\n[768-D Embedding]\n\n", justify="center", style="bold cyan")
+    text.append("Topology: Ingest -> SNN\n", style="dim")
+    text.append("Normalization: Min-Max\n", style="dim")
+    text.append("\nStatus: ", style="white")
+    text.append("INGESTING", style="bold green")
+    return Panel(text, title="[b]Input Source[/b]", border_style="cyan", padding=(1, 1))
+
 def render_raster(tick, spikes):
     text = Text(f"Simulating SNN Horizon at t={tick} ms\n\n", style="dim")
     for channel, spike_val in enumerate(spikes):
@@ -41,6 +50,10 @@ def render_telemetry(tick, latency):
 
 def main():
     layout = create_layout()
+    
+    # Pre-load the static input panel into the empty zone
+    layout["zone1_input"].update(render_input())
+    
     with Live(layout, refresh_per_second=30, screen=True):
         for message in pubsub.listen():
             if message['type'] == 'message':
