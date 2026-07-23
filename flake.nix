@@ -15,6 +15,7 @@
       pandas
       matplotlib
       rich
+      lava-dl # Added Intel Lava Framework dependency
     ]);
   in {
     devShells.x86_64-linux.default = pkgs.mkShell {

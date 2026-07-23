@@ -9,6 +9,18 @@ services:
       neuromorphic_mesh:
         ipv4_address: 10.0.0.5
 
+  snn-workload:
+    build:
+      context: .
+      dockerfile: Dockerfile.snn_workload
+    container_name: lava-snn-workload
+    networks:
+      neuromorphic_mesh:
+        ipv4_address: 10.0.0.6 # Assign a unique IP within the subnet
+    depends_on:
+      - telemetry-broker # Ensure Redis is up before SNN starts
+    restart: on-failure # Restart if the SNN workload crashes
+
 networks:
   neuromorphic_mesh:
     driver: bridge

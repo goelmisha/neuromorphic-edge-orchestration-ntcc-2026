@@ -5,10 +5,11 @@ import time
 import csv
 
 # Connect to the Alpine Redis Container
+# Connect to the Alpine Redis Container via its Docker Compose IP
 try:
-    r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    r = redis.Redis(host='10.0.0.5', port=6379, decode_responses=True)
 except Exception as e:
-    print("Redis broker unreachable.")
+    print(f"Redis broker unreachable: {e}")
     exit(1)
 
 def normalize_vector(v):
