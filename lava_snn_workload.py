@@ -8,11 +8,12 @@ from lava.proc.io.sink import RingBufferSink
 from lava.magma.core.run_conditions import RunSteps
 from lava.magma.core.run_configs import Loihi1SimCfg
 
-# Connect to Redis using its Docker Compose network IP
+# Connect to Redis exposed on the k8s-master VM's private IP.
+# This allows the workload to function correctly even when migrated to k8s-worker1.
 try:
-    r = redis.Redis(host='10.0.0.5', port=6379, decode_responses=True)
+    r = redis.Redis(host='192.168.56.100', port=6379, decode_responses=True)
 except Exception as e:
-    print("Redis broker unreachable for SNN workload.")
+    print(f"Redis broker unreachable for SNN workload on 192.168.56.100:6379: {e}")
     exit(1)
 
 pubsub = r.pubsub()

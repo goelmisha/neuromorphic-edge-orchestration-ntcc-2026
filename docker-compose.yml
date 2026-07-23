@@ -3,11 +3,13 @@ services:
   telemetry-broker:
     image: redis:alpine
     container_name: lava-redis-bus
+    # Expose Redis to the host's private network IP for direct access from VMs
+    # and the host for CRIU migration scenarios.
     ports:
-      - "6379:6379"
+      - "192.168.56.100:6379:6379" # Bind to k8s-master's private IP
     networks:
       neuromorphic_mesh:
-        ipv4_address: 10.0.0.5
+        ipv4_address: 10.0.0.5 # Internal Docker IP
 
   snn-workload:
     build:

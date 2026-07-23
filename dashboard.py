@@ -9,8 +9,8 @@ from rich.text import Text
 from rich.console import Console
 
 console = Console()
-# Connect to the Alpine Redis Container via its Docker Compose IP
-r = redis.Redis(host='10.0.0.5', port=6379, decode_responses=True)
+# Connect to the Redis container exposed on the k8s-master VM's private IP
+r = redis.Redis(host='192.168.56.100', port=6379, decode_responses=True)
 pubsub = r.pubsub()
 pubsub.subscribe('snn_output_telemetry') # Changed to subscribe to SNN output
 

@@ -5,11 +5,11 @@ import time
 import csv
 
 # Connect to the Alpine Redis Container
-# Connect to the Alpine Redis Container via its Docker Compose IP
+# Connect to the Redis container exposed on the k8s-master VM's private IP
 try:
-    r = redis.Redis(host='10.0.0.5', port=6379, decode_responses=True)
+    r = redis.Redis(host='192.168.56.100', port=6379, decode_responses=True)
 except Exception as e:
-    print(f"Redis broker unreachable: {e}")
+    print(f"Redis broker unreachable on 192.168.56.100:6379: {e}")
     exit(1)
 
 def normalize_vector(v):

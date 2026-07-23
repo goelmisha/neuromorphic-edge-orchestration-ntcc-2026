@@ -25,6 +25,11 @@ Vagrant.configure("2") do |config|
       # Bring up Tailscale
       sudo tailscale up --hostname $(hostname) --accept-routes --advertise-routes=192.168.56.0/24 & # Run in background
 
+      # Install CRIU and configure for checkpoint/restore
+      sudo apt-get install -y criu
+      sudo sysctl -w kernel.keys.maxkeys=1000000 kernel.keys.maxbytes=20000000
+      sudo swapoff -a # CRIU requires swap to be off
+
       curl -sfL https://get.k3s.io | sh -
       sleep 10
       cp /var/lib/rancher/k3s/server/node-token /vagrant/node-token
@@ -54,6 +59,11 @@ Vagrant.configure("2") do |config|
 
       # Bring up Tailscale
       sudo tailscale up --hostname $(hostname) --accept-routes & # Run in background
+
+      # Install CRIU and configure for checkpoint/restore
+      sudo apt-get install -y criu
+      sudo sysctl -w kernel.keys.maxkeys=1000000 kernel.keys.maxbytes=20000000
+      sudo swapoff -a # CRIU requires swap to be off
 
       while [ ! -f /vagrant/node-token ]; do sleep 2; done
       curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.100:6443 K3S_TOKEN=$(cat /vagrant/node-token) sh -
