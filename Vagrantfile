@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
     end
     master.vm.provision "shell", inline: <<-SHELL
-      sudo ifconfig eth1 mtu 1280 up
+      sudo ip link set enp0s8 mtu 1280
       curl -sfL https://get.k3s.io | sh -
       sleep 10
       cp /var/lib/rancher/k3s/server/node-token /vagrant/node-token
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
     end
     worker1.vm.provision "shell", inline: <<-SHELL
-      sudo ifconfig eth1 mtu 1280 up
+      sudo ip link set enp0s8 mtu 1280
       while [ ! -f /vagrant/node-token ]; do sleep 2; done
       curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.100:6443 K3S_TOKEN=$(cat /vagrant/node-token) sh -
     SHELL
