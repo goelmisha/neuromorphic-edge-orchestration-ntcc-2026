@@ -15,6 +15,16 @@ Vagrant.configure("2") do |config|
     end
     master.vm.provision "shell", inline: <<-SHELL
       sudo ip link set enp0s8 mtu 1280
+
+      # Install Tailscale
+      curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.no-arch.gpg | sudo dd of=/usr/share/keyrings/tailscale-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu jammy main" | sudo tee /etc/apt/sources.list.d/tailscale.list
+      sudo apt-get update
+      sudo apt-get install -y tailscale
+
+      # Bring up Tailscale
+      sudo tailscale up --hostname $(hostname) --accept-routes --advertise-routes=192.168.56.0/24 & # Run in background
+
       curl -sfL https://get.k3s.io | sh -
       sleep 10
       cp /var/lib/rancher/k3s/server/node-token /vagrant/node-token
@@ -35,6 +45,16 @@ Vagrant.configure("2") do |config|
     end
     worker1.vm.provision "shell", inline: <<-SHELL
       sudo ip link set enp0s8 mtu 1280
+
+      # Install Tailscale
+      curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.no-arch.gpg | sudo dd of=/usr/share/keyrings/tailscale-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu jammy main" | sudo tee /etc/apt/sources.list.d/tailscale.list
+      sudo apt-get update
+      sudo apt-get install -y tailscale
+
+      # Bring up Tailscale
+      sudo tailscale up --hostname $(hostname) --accept-routes & # Run in background
+
       while [ ! -f /vagrant/node-token ]; do sleep 2; done
       curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.100:6443 K3S_TOKEN=$(cat /vagrant/node-token) sh -
     SHELL
