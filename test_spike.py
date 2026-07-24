@@ -7,7 +7,7 @@ import csv
 # Connect to the Alpine Redis Container
 # Connect to the Redis container exposed on the k8s-master VM's private IP
 try:
-    r = redis.Redis(host='192.168.56.100', port=6379, decode_responses=True)
+    r = redis.Redis(host='127.0.0.1', port=6379, decode_responses=True)
 except Exception as e:
     print(f"Redis broker unreachable on 192.168.56.100:6379: {e}")
     exit(1)

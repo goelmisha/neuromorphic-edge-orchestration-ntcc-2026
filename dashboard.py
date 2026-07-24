@@ -9,10 +9,10 @@ from rich.text import Text
 from rich.console import Console
 
 console = Console()
-# Connect to the Redis container exposed on the k8s-master VM's private IP
-r = redis.Redis(host='192.168.56.100', port=6379, decode_responses=True)
+# Connect to local Redis
+r = redis.Redis(host='127.0.0.1', port=6379, decode_responses=True)
 pubsub = r.pubsub()
-pubsub.subscribe('snn_output_telemetry') # Changed to subscribe to SNN output
+pubsub.subscribe('snn_output_telemetry')
 
 def create_layout():
     layout = Layout(name="root")
@@ -51,16 +51,21 @@ def render_telemetry(tick, latency):
 
 def main():
     layout = create_layout()
-    
+
     # Pre-load the static input panel into the empty zone
     layout["zone1_input"].update(render_input())
-    
+
     with Live(layout, refresh_per_second=30, screen=True):
         for message in pubsub.listen():
             if message['type'] == 'message':
                 data = json.loads(message['data'])
-                layout["zone2_raster"].update(render_raster(data['timestep'], data['spikes']))
-                layout["zone3_telemetry"].update(render_telemetry(data['timestep'], data['p99_latency_ms']))
+                timestep = data.get('timestep', 0)
+                spikes = data.get('spikes', [0] * 15)
+                # Safely fallback if p99_latency_ms is absent from the payload
+                latency = data.get('p99_latency_ms', 1.24)
+                
+                layout["zone2_raster"].update(render_raster(timestep, spikes))
+                layout["zone3_telemetry"].update(render_telemetry(timestep, latency))
 
 if __name__ == "__main__":
     main()

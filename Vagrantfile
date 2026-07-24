@@ -1,5 +1,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/jammy64"
+  config.vbguest.auto_update = false
   config.vm.boot_timeout = 600
 
   # Control Plane (x86 Primary Workstation)
@@ -11,7 +12,8 @@ Vagrant.configure("2") do |config|
       vb.memory = "3000"
       vb.cpus = 4
       vb.gui = true
-      vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
+      vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
     end
     master.vm.provision "shell", inline: <<-SHELL
       sudo ip link set enp0s8 mtu 1280
@@ -46,7 +48,8 @@ Vagrant.configure("2") do |config|
       vb.memory = "2048"
       vb.cpus = 1
       vb.gui = true
-      vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
+      vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
     end
     worker1.vm.provision "shell", inline: <<-SHELL
       sudo ip link set enp0s8 mtu 1280

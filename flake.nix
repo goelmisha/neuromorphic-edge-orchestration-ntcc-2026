@@ -1,11 +1,19 @@
 {
   description = "Elastic Lava Runtime Environment";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-  outputs = { self, nixpkgs }: let
-    pkgs = import nixpkgs { system = "x86_64-linux"; };
-    # Bumped directly to python314 to clear the sphinx restriction
-    pythonEnv = pkgs.python314.withPackages (ps: with ps; [
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Pull in an older release specifically for Python 3.10
+    nixpkgs-old.url = "github:NixOS/nixpkgs/nixos-23.11";
+  };
+
+  outputs = { self, nixpkgs, nixpkgs-old }: let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs { inherit system; };
+    pkgsOld = import nixpkgs-old { inherit system; };
+
+    # Grab Python 3.10 from the older package set
+    pythonEnv = pkgsOld.python310.withPackages (ps: with ps; [
       numpy
       scipy
       pyzmq
@@ -15,10 +23,10 @@
       pandas
       matplotlib
       rich
-      lava-dl # Added Intel Lava Framework dependency
+      pip
     ]);
   in {
-    devShells.x86_64-linux.default = pkgs.mkShell {
+    devShells.${system}.default = pkgs.mkShell {
       buildInputs = [
         pythonEnv
         pkgs.zeromq
@@ -28,8 +36,7 @@
         pkgs.tmux
       ];
       shellHook = ''
-        # Path updated to match python3.14
-        export PYTHONPATH="${pythonEnv}/lib/python3.14/site-packages:$PYTHONPATH"
+        export PYTHONPATH="${pythonEnv}/lib/python3.10/site-packages:$PYTHONPATH"
         echo "Lava Neuromorphic Environment Loaded. Parity: Deterministic."
       '';
     };
